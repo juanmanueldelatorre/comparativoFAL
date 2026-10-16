@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comparativo FAL Grupo SEGRUP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: informe de una columna; matriz Sí/No a ancho completo; simulador con barras que recalculan el valor 2027 de cada opción */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#18221f; --muted:#5b6862; --line:#d9dfdc;
+  --accent:#0d6b5b; --accent-soft:#e1efeb;
+  --yes:#1d7a45; --yes-bg:#e3f3e8; --no:#b0413e; --no-bg:#f8e6e5; --mid:#a86a12; --mid-bg:#fbefd9; --na:#7a8580; --na-bg:#eceeed;
+  --c-bbva:#1f4fbf; --c-gal:#d9661f; --c-bna:#2a7fa8; --c-macro:#5a54c4; --c-lbo:#3d3d3d; --c-san:#c0392b;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111816; --surface:#18211e; --ink:#e7eeeb; --muted:#9aa8a2; --line:#2b3632;
+  --accent:#4cc3a8; --accent-soft:#16302a;
+  --yes:#5cd18c; --yes-bg:#163225; --no:#f08a86; --no-bg:#3a1d1c; --mid:#f0b45a; --mid-bg:#3a2b14; --na:#9aa8a2; --na-bg:#232c29;
+  --c-bbva:#6f97ff; --c-gal:#ff9a5a; --c-bna:#66bde6; --c-macro:#9d97ff; --c-lbo:#c9c9c9; --c-san:#ff7b6b;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111816; --surface:#18211e; --ink:#e7eeeb; --muted:#9aa8a2; --line:#2b3632;
+  --accent:#4cc3a8; --accent-soft:#16302a;
+  --yes:#5cd18c; --yes-bg:#163225; --no:#f08a86; --no-bg:#3a1d1c; --mid:#f0b45a; --mid-bg:#3a2b14; --na:#9aa8a2; --na-bg:#232c29;
+  --c-bbva:#6f97ff; --c-gal:#ff9a5a; --c-bna:#66bde6; --c-macro:#9d97ff; --c-lbo:#c9c9c9; --c-san:#ff7b6b;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);font-stretch:85%;text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.6rem;font-weight:750}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0;max-width:72ch}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{color:var(--muted);font-size:1.05rem}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+section{display:flex;flex-direction:column;gap:16px}
+.head{display:flex;flex-direction:column;gap:12px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:.85rem}
+.meta b{color:var(--ink);font-weight:600}
+
+.verdict{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.verdict strong{font-family:var(--display);font-stretch:85%;font-size:1.35rem;font-weight:750;line-height:1.2}
+.deadlines{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+
+.rank{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.rcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rcard .pos{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.rcard .name{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+.rcard .val{font-family:var(--mono);font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums}
+.rcard .sub{font-size:.8rem;color:var(--muted)}
+.rcard.top{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%}
+.matrix{min-width:980px}
+.matrix th,.matrix td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.85rem}
+.matrix thead th{font-size:.8rem;background:var(--surface)}
+.matrix thead th .name{display:flex;align-items:center;gap:7px;font-weight:700;font-size:.92rem}
+.matrix tbody th{font-weight:600;width:200px}
+.matrix tbody th small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+.matrix tr:last-child td,.matrix tr:last-child th{border-bottom:0}
+.pill{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:.78rem;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill.y{color:var(--yes);background:var(--yes-bg)}
+.pill.n{color:var(--no);background:var(--no-bg)}
+.pill.m{color:var(--mid);background:var(--mid-bg)}
+.pill.x{color:var(--na);background:var(--na-bg)}
+.cell-note{display:block;margin-top:4px;color:var(--muted);font-size:.79rem;line-height:1.4}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;color:var(--muted)}
+
+/* duelo BBVA vs Santander */
+.duel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.duel{grid-template-columns:1fr}}
+.side{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.side .big{font-family:var(--mono);font-size:1.7rem;font-weight:600}
+.side dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.86rem}
+.side dt{color:var(--muted)}
+.side dd{margin:0;font-weight:600}
+
+.sim{display:grid;grid-template-columns:minmax(0,350px) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.sim{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:16px;min-width:0}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+legend{font-weight:700;font-size:.85rem;margin-bottom:6px}
+label.chk{display:flex;align-items:center;gap:8px;font-size:.86rem}
+label.chk .tag{margin-left:auto;color:var(--muted);font-size:.75rem;text-align:right}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;flex:none}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:6px;font-size:.85rem;font-weight:600}
+.field input[type=number]{font-family:var(--mono);font-size:.95rem;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.field .hint,.hint{font-weight:400;color:var(--muted);font-size:.78rem}
+.rangeval{font-family:var(--mono);color:var(--accent);font-weight:600}
+input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bars{display:flex;flex-direction:column;gap:14px}
+.bar{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:center}
+@media (max-width:480px){.bar{grid-template-columns:1fr}}
+.bar .lab{display:flex;align-items:center;gap:7px;font-weight:700;font-size:.9rem}
+.track{position:relative;height:28px;background:var(--bg);border-radius:6px;overflow:hidden}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:6px;transition:width .35s ease;min-width:2px}
+.bar .v{font-family:var(--mono);font-size:.85rem;font-weight:600;margin-top:3px}
+.bar .d{font-size:.78rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card header{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.card header .name{display:flex;align-items:center;gap:8px}
+.card h4{margin:0 0 4px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:.87rem}
+
+.base{min-width:560px}
+.base th,.base td{padding:9px 12px;border-bottom:1px solid var(--line);font-size:.88rem;text-align:right}
+.base th:first-child,.base td:first-child{text-align:left}
+.base thead th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.base tr.total td{font-weight:700;border-bottom:0}
+.notes{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.step{font-family:var(--mono);font-size:.8rem;font-weight:600;color:var(--surface);background:var(--accent);width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center}
+.stack{display:flex;height:44px;border-radius:8px;overflow:hidden;gap:2px}
+.stack>div{display:flex;align-items:center;padding:0 10px;min-width:0}
+.stack span{color:var(--bg);font-weight:700;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk{display:inline-flex;align-items:center;gap:7px;font-family:var(--body);font-weight:600}
+.orgs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.orgs{grid-template-columns:1fr}}
+.org{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.org.grp{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.org .olab{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.org .onum{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:3.2rem;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
+.org .ounit{font-size:.85rem;opacity:.8}
+.org .omoney{font-family:var(--mono);font-weight:600;font-size:1.1rem;margin-top:10px}
+.org .omoney small{font-family:var(--body);font-weight:400;font-size:.8rem;opacity:.75}
+.org .obanks{font-size:.8rem;opacity:.75;margin-top:4px}
+.bankgrid{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.brow{display:grid;grid-template-columns:minmax(150px,1.2fr) repeat(3,minmax(0,.8fr)) minmax(0,2fr);gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.brow:last-child{border-bottom:0}
+.bhead{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:10px;background:var(--bg)}
+.bfoot{background:var(--bg)}
+.bname{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-weight:700;font-size:1.02rem}
+.bpct{flex-basis:100%;padding-left:18px;font-weight:400;font-size:.78rem;color:var(--muted)}
+.bcell{display:flex;flex-direction:column;min-width:0}
+.bcell .bn{font-family:var(--mono);font-weight:600;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.bcell .bm{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.bcell.tot .bn{color:var(--accent)}
+.bbar{display:flex;height:22px;background:var(--bg);border-radius:5px;overflow:hidden}
+.bbar .seg{height:100%}
+.bbar .seg.ori,.sw.ori{opacity:.4}
+.bleg{display:flex;gap:14px;text-transform:none;letter-spacing:0;font-weight:600}
+.bleg span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:2px;background:var(--muted);display:inline-block}
+@media (max-width:760px){
+  .brow{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .brow .bname{grid-column:1/-1}
+  .brow .bbar{grid-column:1/-1}
+  .bhead>div:first-child,.bhead .bleg{display:none}
+  .bfoot>div:last-child{display:none}
+}
+.seg-ctl{display:inline-flex;align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg-ctl button{font:inherit;font-weight:700;font-size:.88rem;border:0;background:transparent;color:var(--muted);padding:8px 18px;border-radius:999px;cursor:pointer}
+.seg-ctl button:hover{color:var(--ink)}
+.seg-ctl button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+.seg-ctl button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.org{transition:opacity .2s}
+.orgs.filtered .org:not(.on){opacity:.4}
+.orgs.filtered .org.grp:not(.on){background:var(--surface);color:var(--ink);border-color:var(--line)}
+.bankgrid.single .brow{grid-template-columns:minmax(150px,1.2fr) minmax(0,1fr) minmax(0,2.6fr)}
+@media (max-width:760px){.bankgrid.single .brow{grid-template-columns:1fr}}
+.sheetnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.sheetnav-in{max-width:1180px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));scrollbar-width:thin}
+.sheetnav button{font:inherit;font-size:.86rem;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 14px 7px 8px;border-radius:999px;cursor:pointer}
+.sheetnav button .n{font-family:var(--mono);font-size:.75rem;width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.sheetnav button:hover{color:var(--ink)}
+.sheetnav button[aria-current="true"]{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.sheetnav button[aria-current="true"] .n{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.sheetnav button:focus-visible,.pager button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap>section.sheet{min-height:60vh}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.pager button{font:inherit;font-weight:700;font-size:.9rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;border-radius:999px;cursor:pointer}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager span{color:var(--muted);font-size:.85rem}
+.wrap{padding-block:24px 48px !important}
+[hidden]{display:none!important}
+.mxscroll{max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);overflow:auto}
+.matrix{border-collapse:separate;border-spacing:0}
+.matrix thead th{position:sticky;top:0;z-index:2;background:var(--surface);box-shadow:inset 0 -2px 0 var(--line)}
+.matrix tbody th{position:sticky;left:0;z-index:1;background:var(--surface)}
+.matrix thead th:first-child{left:0;z-index:3}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.duo{grid-template-columns:1fr}}
+.res{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.res .rhead{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem}
+.res .rhead .pill{margin-left:auto}
+.res .rbig{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:600;line-height:1.1}
+.res .rsub{font-size:.85rem;color:var(--muted)}
+.res .rwhen{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.diffline{font-size:1rem}
+.ctl{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.ctl .field{flex:1 1 280px}
+.ghost{font:inherit;font-weight:600;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer}
+.calc{min-width:820px}
+.calc th,.calc td{padding:9px 12px;border-bottom:1px solid var(--line);font-size:.86rem;text-align:left;vertical-align:middle}
+.calc thead th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.calc .r{text-align:right}
+.calc td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+.calc .cin{font-family:var(--mono);font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:90px}
+.calc .cin.wide{width:150px}
+.calc tr.off td{opacity:.45}
+.calc tr.off td:first-child{opacity:1}
+.calc .muted{color:var(--muted);font-family:var(--body);font-weight:400;font-size:.8rem}
+.calc tfoot tr.sub td{font-weight:600;background:var(--bg)}
+.calc tfoot tr.grand td{font-weight:800;font-size:.95rem;border-bottom:0}
+.res .rlab{font-size:.85rem;font-weight:600;margin-top:-2px}
+.side .big small.per{display:block;font-family:var(--body);font-size:.8rem;font-weight:500;color:var(--muted);margin-top:2px}
+.calc.flow{min-width:620px}
+.hbars{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.hb{display:grid;grid-template-columns:130px minmax(0,1fr) 90px;gap:12px;align-items:center}
+.hbl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem}
+.hbt{height:26px;background:var(--bg);border-radius:6px;overflow:hidden}
+.hbf{display:block;height:100%;border-radius:6px}
+.hbv{text-align:right;font-weight:600;font-size:.92rem}
+.dcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+.dcard{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.dcard header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dname{display:flex;align-items:center;gap:8px;font-family:var(--display);font-stretch:85%;font-weight:800;font-size:1.4rem}
+.dval{display:flex;flex-direction:column;gap:2px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.dval .num{font-size:1.9rem;font-weight:600;line-height:1.1}
+.dval small{color:var(--muted);font-size:.82rem}
+.dgroup{display:flex;flex-direction:column;gap:8px}
+.glab{display:flex;align-items:center;gap:8px;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ic{font-style:normal;width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:.75rem;font-weight:800}
+.ic.ok{background:var(--yes-bg);color:var(--yes)}
+.ic.ask{background:var(--mid-bg);color:var(--mid)}
+.ic.q{background:var(--na-bg);color:var(--na)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.84rem;line-height:1.3;padding:6px 10px;border-radius:8px;border:1px solid transparent}
+.chip.ok{background:var(--yes-bg);color:var(--ink)}
+.chip.ask{background:var(--mid-bg);color:var(--ink)}
+.chip.q{background:var(--na-bg);color:var(--ink)}
+.chip.none{color:var(--muted);border-color:var(--line);border-style:dashed}
+@media (max-width:480px){.hb{grid-template-columns:100px minmax(0,1fr) 70px}}
+.hctl{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.hctl .field{flex:0 1 220px}
+.hctl .field input{font-family:var(--mono);font-size:1rem;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{font:inherit;font-size:.82rem;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.presets button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.presets button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#hbList{display:flex;flex-direction:column;gap:10px}
+.hb{grid-template-columns:130px minmax(0,1fr) 190px}
+.hbv small{color:var(--muted);font-size:.75rem;font-weight:500}
+@media (max-width:560px){.hb{grid-template-columns:100px minmax(0,1fr)}.hbv{grid-column:1/-1;text-align:left}}
+.cstep{display:flex;flex-direction:column;gap:12px}
+.cstep-h{display:flex;align-items:center;gap:10px}
+.cnum{font-family:var(--mono);font-weight:600;font-size:.85rem;width:28px;height:28px;border-radius:8px;display:inline-grid;place-items:center;background:var(--accent);color:var(--bg)}
+.calc.now{min-width:560px}
+.calc .strong{color:var(--accent);font-weight:700}
+.calc tr.grand td{font-weight:800;border-bottom:0;background:var(--bg)}
+.destpick{display:flex;flex-wrap:wrap;gap:8px}
+.destpick button{font:inherit;font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:12px;cursor:pointer}
+.destpick button[aria-pressed="true"]{border-color:var(--c);background:var(--bg)}
+.destpick button:focus-visible,.mvrow input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.movebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 18px}
+.movehead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mvbtns{display:flex;gap:6px;text-transform:none;letter-spacing:0}
+.mvrow{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(0,2fr) 100px 60px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.mvlab{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;font-size:.92rem}
+.mvlab small{flex-basis:100%;padding-left:16px;color:var(--muted);font-size:.78rem}
+.mvrow input[type=range]{width:100%;accent-color:var(--accent)}
+.mvrow .cin{font-family:var(--mono);font-size:.95rem;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.mvrow .of{color:var(--muted);font-size:.8rem}
+@media (max-width:640px){.mvrow{grid-template-columns:1fr 90px 50px}.mvrow .mvlab{grid-column:1/-1}}
+.movebox .hint{display:block;padding:8px 0 4px;margin:0}
+.movetot{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:800}
+.movetot .num{font-size:1.15rem;color:var(--accent)}
+.gain{background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:6px}
+.gtop{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.gname{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem}
+.gbig{font-size:clamp(2rem,6vw,3rem);font-weight:600;line-height:1.1}
+.gbig small{font-family:var(--body);font-size:1rem;font-weight:600;color:var(--muted)}
+.gsub{font-size:.95rem}
+.gline{font-size:.85rem;color:var(--muted)}
+#cmpBars{display:flex;flex-direction:column;gap:10px}
+.hb.sel .hbl{text-decoration:underline;text-underline-offset:4px}
+.gdetail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+@media (max-width:760px){.gdetail{grid-template-columns:1fr}}
+.calc.permes{min-width:560px}
+.calc.permes tr.hl td{background:var(--accent-soft)}
+.paybox{border:2px solid var(--pc);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.paytag{align-self:flex-start;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--surface);background:var(--pc);padding:3px 9px;border-radius:999px}
+.payrow{display:grid;grid-template-columns:130px minmax(0,1fr);gap:10px;align-items:baseline;font-size:.86rem}
+.payrow .pamt{font-weight:600;font-size:.95rem}
+.payrow.tot{border-top:1px solid var(--line);padding-top:8px}
+</style>
+</head>
+<body>
+
+<nav class="sheetnav" aria-label="Hojas"><div class="sheetnav-in" id="sheetnav"></div></nav>
+<div class="wrap">
+
+  <section class="sheet" id="nomina" data-label="Nómina" aria-labelledby="nm">
+    <h2 id="nm">Nómina por empresa y banco</h2>
+    <p class="lead">Cuántos empleados cobran hoy en cada banco y cuánto se les paga por mes (sueldos de septiembre 2026).</p>
+
+    <div class="orgs">
+      <div class="org" data-org="s">
+        <span class="olab">SEGRUP Argentina SRL</span>
+        <span class="onum">1.194</span><span class="ounit">empleados</span>
+        <span class="omoney">$ 1.900.080.579 <small>por mes</small></span>
+        <span class="obanks">4 bancos: Galicia, Macro, BBVA, Santander</span>
+      </div>
+      <div class="org" data-org="o">
+        <span class="olab">Origen Seguridad SA</span>
+        <span class="onum">238</span><span class="ounit">empleados</span>
+        <span class="omoney">$ 363.927.503 <small>por mes</small></span>
+        <span class="obanks">3 bancos: BBVA, Galicia, Santander</span>
+      </div>
+      <div class="org grp" data-org="all">
+        <span class="olab">Total grupo</span>
+        <span class="onum">1.432</span><span class="ounit">empleados</span>
+        <span class="omoney">$ 2.264.008.082 <small>por mes</small></span>
+        <span class="obanks">Ninguno cobra hoy en Banco Nación</span>
+      </div>
+    </div>
+
+    <div class="seg-ctl" role="group" aria-label="Ver nómina de">
+      <button type="button" id="fAll" data-f="all" aria-pressed="true">Ambas</button>
+      <button type="button" id="fSeg" data-f="s" aria-pressed="false">SEGRUP</button>
+      <button type="button" id="fOri" data-f="o" aria-pressed="false">ORIGEN</button>
+    </div>
+    <div class="bankgrid" id="bankgrid" role="table" aria-label="Empleados y sueldos por banco y empresa"></div>
+    <p class="notes">Montos = sueldos netos acreditados en el mes. ORIGEN declara 250 empleados en el F.931 de julio; en septiembre se acreditaron 238.</p>
+  </section>
+
+  <section class="sheet" id="si-no" data-label="Sí / No" aria-labelledby="mx">
+    <h2 id="mx">Qué da cada uno: Sí / No</h2>
+    <div class="legend">
+      <span class="pill y">✓ Sí</span><span class="pill m">◐ Parcial / condicionado</span><span class="pill n">✗ No</span><span class="pill x">— No informado</span>
+    </div>
+    <div class="scroll mxscroll">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th scope="col">Beneficio</th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-bbva)"></i>BBVA</span></th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-san)"></i>Santander</span></th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-bna)"></i>Banco Nación</span></th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-gal)"></i>Galicia</span></th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-macro)"></i>Macro</span></th>
+            <th scope="col"><span class="name"><i class="dot" style="background:var(--c-lbo)"></i>LBO</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Plata por cada empleado que mudemos<small>El beneficio grande</small></th>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">2,5% del sueldo neto de cada persona mudada, todos los meses de 2027 (≈ $40.000 por mes por persona)</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">$200.000 + IVA por persona + $80.000 en feb-2027 al integrar el FAL</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Es efectivo de libre disponibilidad<small>Caja libre, fuera del FAL</small></th>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">El reintegro se acredita en la cuenta de la empresa</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">Se acredita en la cuenta de la empresa contra factura</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">Solo el reintegro de comisión, en cuenta corriente BNA</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Comisión 2027 bonificada</th>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">0% hasta 31/12/2027</span></td>
+            <td><span class="pill m">◐ Condicionado</span><span class="cell-note">Primer año, si permanecemos 24 meses</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">Reintegra el 100% hasta 31/12/2027</span></td>
+            <td><span class="pill n">✗ No</span><span class="cell-note">"En definición", tope 1%</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill x">— No informado</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Comisión posterior definida</th>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">0,50% anual desde 2028</span></td>
+            <td><span class="pill n">✗ No</span><span class="cell-note">No informa el % después del primer año</span></td>
+            <td><span class="pill n">✗ No</span><span class="cell-note">No informa el % de Pellegrini</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill n">✗ No</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Crédito o tasa preferencial para la empresa</th>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill m">◐ Parcial</span><span class="cell-note">−3 p.p. en cheques, capital de trabajo e inversión, solo hasta 31/12/2026</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">28,5% TNA fija a 6 meses, amortización mensual</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill n">✗ No</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Beneficios para empleados</th>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">Paquete bonificado, 50% en servicios 6 meses, hipotecario UVA+7,5%, préstamos −10%</span></td>
+            <td><span class="pill y">✓ Sí</span><span class="cell-note">Paquete 100% bonificado, 50% en compras hasta $15.000, hipotecarios PAS, seguros −15%</span></td>
+            <td><span class="pill m">◐ Condicionado</span><span class="cell-note">−5 p.p. en préstamos Plan Sueldo, 180 días, con nómina en BNA</span></td>
+            <td><span class="pill n">✗ No</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill n">✗ No</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Exige mudar nómina<small>Condición, no beneficio</small></th>
+            <td><span class="pill m">◐ Para el reintegro</span><span class="cell-note">Nóminas sumadas hasta dic-2026</span></td>
+            <td><span class="pill m">◐ Para el pago</span><span class="cell-note">Mínimo 50 personas, neto promedio ≥ $1,1 M, 24 meses</span></td>
+            <td><span class="pill m">◐ Solo empleados</span></td>
+            <td><span class="pill y">✓ No exige</span></td>
+            <td><span class="pill x">—</span></td>
+            <td><span class="pill y">✓ No exige</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Permanencia exigida</th>
+            <td><span class="pill x">— No informada</span></td>
+            <td><span class="pill n">24 meses</span><span class="cell-note">Nómina y FAL; choca con la portabilidad semestral</span></td>
+            <td><span class="pill x">— No informada</span><span class="cell-note">Carta de intención</span></td>
+            <td><span class="pill x">— No informada</span></td>
+            <td><span class="pill x">—</span></td>
+            <td><span class="pill x">—</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Plazo para pagar indemnizaciones</th>
+            <td><span class="pill y">✓ T+1</span><span class="cell-note">Objetivo, no garantizado</span></td>
+            <td><span class="pill y">✓ ≤ 5 días hábiles</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill y">✓ ≤ 5 días hábiles</span></td>
+            <td><span class="pill x">— No informado</span></td>
+            <td><span class="pill x">— No informado</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sheet" id="bbva-santander" data-label="BBVA vs Santander" aria-labelledby="du">
+    <h2 id="du">Beneficio remunerado: BBVA vs Santander, por empleado mudado</h2>
+    <div class="duel">
+      <div class="side" style="--c:var(--c-bbva)">
+        <span class="name" style="display:flex;align-items:center;gap:8px;font-weight:700"><i class="dot" style="background:var(--c-bbva)"></i>BBVA</span>
+        <span class="big">≈ $40.000 <small class="per">por persona, por mes · todos los meses de 2027</small></span>
+        <div class="paybox" style="--pc:var(--c-bbva)">
+          <span class="paytag">Paga todos los meses</span>
+          <div class="payrow"><span class="pamt num">2,5%</span><span class="pdesc">de la <b>acreditación de sueldo</b> (neto) de cada persona mudada, <b>cada mes</b></span></div>
+          <div class="payrow"><span class="pamt num">× 12 meses</span><span class="pdesc">de <b>enero a diciembre 2027</b>, en la cuenta de la empresa</span></div>
+          <div class="payrow"><span class="pamt num">≈ $40.000</span><span class="pdesc">por persona, por mes (neto promedio $1,59 M)</span></div>
+          <div class="payrow tot"><span class="pamt num">≈ $477.000</span><span class="pdesc">por persona en el año.</span></div>
+        </div>
+        <dl>
+          <dt>Qué es</dt><dd>2,5% del sueldo neto por mes (neto promedio $1,59 M → ≈ $40.000). En el año ≈ $477.000</dd>
+          <dt>Cuándo</dt><dd>Todos los meses, de enero a diciembre 2027</dd>
+          <dt>Forma</dt><dd>Efectivo en la cuenta de la empresa</dd>
+          <dt>Quiénes</dt><dd>Los que hoy cobran en Galicia, Macro y Santander. No cuenta a los 395 que ya cobran en BBVA</dd>
+          <dt>Permanencia</dt><dd>No informada</dd>
+        </dl>
+      </div>
+      <div class="side" style="--c:var(--c-san)">
+        <span class="name" style="display:flex;align-items:center;gap:8px;font-weight:700"><i class="dot" style="background:var(--c-san)"></i>Santander</span>
+        <span class="big">≈ $23.333 <small class="per">por persona, por mes si se reparte en 12 meses · en 24 meses ≈ $11.667</small></span>
+        <div class="paybox" style="--pc:var(--c-san)">
+          <span class="paytag">Paga una sola vez</span>
+          <div class="payrow"><span class="pamt num">$200.000 + IVA</span><span class="pdesc">por persona, <b>una sola vez</b>, a los 15 días hábiles del primer pago de sueldos en Santander</span></div>
+          <div class="payrow"><span class="pamt num">+ $80.000</span><span class="pdesc">por persona, en <b>febrero 2027</b>, una vez integrado el FAL</span></div>
+          <div class="payrow tot"><span class="pamt num">= $280.000</span><span class="pdesc">por persona en total. No hay más pagos después.</span></div>
+        </div>
+        <dl>
+          <dt>Qué es</dt><dd>Pago único de $200.000 + IVA al mudar + $80.000 en feb-2027 = $280.000 por persona. El IVA no es ganancia: se cobra y se paga a ARCA</dd>
+          <dt>Cuándo</dt><dd>15 días hábiles después del pago de sueldos en Santander; los $80.000, en febrero 2027</dd>
+          <dt>Forma</dt><dd>Efectivo de libre disponibilidad, contra factura (es ingreso gravado)</dd>
+          <dt>Quiénes</dt><dd>Los que hoy cobran en Galicia, Macro y BBVA. Mínimo 50 personas</dd>
+          <dt>Permanencia</dt><dd>24 meses de nómina y FAL</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="scroll">
+      <table class="calc permes">
+        <thead><tr><th>Por mes, para el grupo (mudando todos)</th><th class="r">BBVA</th><th class="r">Santander</th></tr></thead>
+        <tbody>
+          <tr><td>Personas que cuentan</td><td class="r num">1.037</td><td class="r num">1.381</td></tr>
+          <tr><td>Cómo paga</td><td class="r">2,5% del neto, todos los meses de 2027</td><td class="r">Una sola vez: $ 276,2 M a los 15 días hábiles del primer sueldo + $ 110,5 M en feb-27</td></tr>
+          <tr class="hl"><td><b>Por mes, repartido en 12 meses</b></td><td class="r num"><b>$ 41.178.295</b></td><td class="r num"><b>$ 32.223.333</b></td></tr>
+          <tr><td>Por mes, repartido en 24 meses (permanencia de Santander)</td><td class="r num">$ 20.589.148</td><td class="r num">$ 16.111.667</td></tr>
+          <tr><td>Total</td><td class="r num">$ 494.139.539</td><td class="r num">$ 386.680.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="notes">Los dos pagan en efectivo en la cuenta de la empresa. BBVA paga todos los meses y más por persona; Santander paga casi todo de entrada. Santander, a cambio, puede sumar a los 395 que hoy cobran en BBVA y exige 24 meses de permanencia. Un empleado solo puede cobrar en un banco: estas dos ofertas no se suman.</p>
+      <div class="deadlines">
+      <span class="pill n">Santander: aceptar antes del 31/10/2026</span>
+      <span class="pill m">BBVA: cuentan las nóminas mudadas hasta dic-2026</span>
+    </div>
+  </section>
+
+
+
+  <section class="sheet" id="calculadora" data-label="Calculadora" aria-labelledby="cz">
+    <h2 id="cz">Calculadora</h2>
+
+    <div class="cstep">
+      <div class="cstep-h"><span class="cnum">A</span><h3>Nómina total actual</h3></div>
+      <div class="scroll">
+        <table class="calc now">
+          <thead><tr><th>Banco</th><th class="r">SEGRUP</th><th class="r">ORIGEN</th><th class="r">Total empleados</th><th class="r">Acreditación mensual</th></tr></thead>
+          <tbody id="nowBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cstep">
+      <div class="cstep-h"><span class="cnum">B</span><h3>¿A qué banco la pasamos y cuántas personas?</h3></div>
+      <div class="destpick" role="group" aria-label="Banco destino" id="destPick"></div>
+      <div class="movebox">
+        <div class="movehead"><span>Personas que pasamos desde cada banco</span><span class="mvbtns"><button type="button" class="ghost" id="mvAll">Pasar todos</button><button type="button" class="ghost" id="mvNone">Ninguno</button></span></div>
+        <div id="moveRows"></div>
+        <div class="movetot"><span>Total que pasamos</span><span class="num" id="mvTotal">0</span></div>
+      </div>
+    </div>
+
+    <div class="cstep">
+      <div class="cstep-h"><span class="cnum">C</span><h3>¿Qué ganamos por pasarla?</h3></div>
+      <div class="gain" id="gainCard"></div>
+      <div class="hbars">
+        <span class="eyebrow">Las mismas personas en cada banco, en 2027</span>
+        <div id="cmpBars"></div>
+        <span class="notes">BBVA: 2,5% del neto × 12 meses; no cuenta a quienes ya cobran en BBVA. Santander: $ 280.000 por persona (mínimo 50 por empresa); no cuenta a quienes ya cobran en Santander. * Galicia: ahorro por cada $ 100 M de préstamo al 28,5%.</span>
+      </div>
+      <div class="gdetail" id="gainChips"></div>
+    </div>
+  </section>
+
+
+
+
+  <div class="pager"><button type="button" id="prevS">← Anterior</button><span id="pagePos" class="num"></span><button type="button" id="nextS">Siguiente →</button></div>
+</div>
+
+<script>
+(function(){
+  var B=[
+    {n:"Galicia",k:"gal",sh:555,sp:897075887,oh:93,op:143454500},
+    {n:"BBVA",k:"bbva",sh:268,sp:422432194,oh:127,op:194444092},
+    {n:"Macro",k:"macro",sh:338,sp:527983976,oh:0,op:0},
+    {n:"Santander",k:"san",sh:33,sp:52588522,oh:18,op:26028911}
+  ];
+  function M(v){return v?"$ "+Math.round(v).toLocaleString("es-AR"):"—"}
+  function N(v){return v.toLocaleString("es-AR")}
+  function P(v){return v.toLocaleString("es-AR",{minimumFractionDigits:1,maximumFractionDigits:1})+"%"}
+  function cell(h,p,tot){return '<div class="bcell'+(tot?' tot':'')+'"><span class="bn">'+N(h)+'</span><span class="bm">'+M(p)+'</span></div>'}
+  function render(f){
+    var g=document.getElementById("bankgrid");
+    var rows=B.map(function(b){return {b:b,h:f==="s"?b.sh:f==="o"?b.oh:b.sh+b.oh,p:f==="s"?b.sp:f==="o"?b.op:b.sp+b.op}});
+    var TH=rows.reduce(function(a,r){return a+r.h},0), TP=rows.reduce(function(a,r){return a+r.p},0);
+    var MX=Math.max.apply(null,rows.map(function(r){return r.h}))||1;
+    rows.sort(function(a,b){return b.h-a.h});
+    var lab=f==="s"?"de SEGRUP":f==="o"?"de ORIGEN":"del grupo";
+    var html;
+    {
+      g.classList.add("single");
+      var name=f==="s"?"SEGRUP":f==="o"?"ORIGEN":"Grupo";
+      html='<div class="brow bhead"><div>Banco</div><div>'+name+'</div><div></div></div>';
+      html+=rows.map(function(r){var b=r.b;return '<div class="brow"><div class="bname"><i class="dot" style="background:var(--c-'+b.k+')"></i>'+b.n+'<span class="bpct">'+P(r.h/TH*100)+' '+lab+'</span></div>'+cell(r.h,r.p,true)+'<div class="bbar" aria-hidden="true"><span class="seg" style="width:'+(r.h/MX*100)+'%;background:var(--c-'+b.k+')"></span></div></div>'}).join("");
+      html+='<div class="brow bfoot"><div class="bname">Total '+name+'</div>'+cell(TH,TP,true)+'<div></div></div>';
+    }
+    g.innerHTML=html;
+    var orgs=document.querySelector(".orgs");
+    orgs.classList.toggle("filtered",f!=="all");
+    Array.prototype.forEach.call(orgs.querySelectorAll(".org"),function(o){o.classList.toggle("on",o.getAttribute("data-org")===f)});
+    Array.prototype.forEach.call(document.querySelectorAll(".seg-ctl button"),function(btn){btn.setAttribute("aria-pressed",btn.getAttribute("data-f")===f?"true":"false")});
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".seg-ctl button"),function(btn){btn.addEventListener("click",function(){render(btn.getAttribute("data-f"))})});
+  render("all");
+})();
+</script>
+
+<script>
+(function(){
+  var sheets=[].slice.call(document.querySelectorAll("section.sheet"));
+  var nav=document.getElementById("sheetnav"), cur=0;
+  nav.innerHTML=sheets.map(function(sh,i){return '<button type="button" data-i="'+i+'"><span class="n">'+(i+1)+'</span>'+sh.getAttribute("data-label")+'</button>'}).join("");
+  var btns=[].slice.call(nav.querySelectorAll("button"));
+  function show(i,scroll){
+    cur=Math.max(0,Math.min(sheets.length-1,i));
+    sheets.forEach(function(sh,j){sh.hidden=j!==cur});
+    btns.forEach(function(b,j){b.setAttribute("aria-current",j===cur?"true":"false")});
+    btns[cur].scrollIntoView({block:"nearest",inline:"nearest"});
+    document.getElementById("prevS").disabled=cur===0;
+    document.getElementById("nextS").disabled=cur===sheets.length-1;
+    document.getElementById("pagePos").textContent="Hoja "+(cur+1)+" de "+sheets.length;
+    try{history.replaceState(null,"","#"+sheets[cur].id)}catch(e){}
+    if(scroll)window.scrollTo(0,0);
+  }
+  btns.forEach(function(b){b.addEventListener("click",function(){show(+b.getAttribute("data-i"),true)})});
+  document.getElementById("prevS").addEventListener("click",function(){show(cur-1,true)});
+  document.getElementById("nextS").addEventListener("click",function(){show(cur+1,true)});
+  document.addEventListener("keydown",function(e){
+    var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+    if(e.key==="ArrowRight")show(cur+1,true);else if(e.key==="ArrowLeft")show(cur-1,true);
+  });
+  var h=(location.hash||"").slice(1), start=0;
+  sheets.forEach(function(sh,j){if(sh.id===h)start=j});
+  show(start,false);
+})();
+</script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var BK={gal:["Galicia","var(--c-gal)"],mac:["Macro","var(--c-macro)"],bbva:["BBVA","var(--c-bbva)"],san:["Santander","var(--c-san)"],bna:["Banco Nación","var(--c-bna)"]};
+  var CO={s:"SEGRUP",o:"ORIGEN"};
+  var ROWS=[
+    {id:"s-gal",c:"s",b:"gal",h:555,p:897075887},{id:"s-mac",c:"s",b:"mac",h:338,p:527983976},{id:"s-bbva",c:"s",b:"bbva",h:268,p:422432194},{id:"s-san",c:"s",b:"san",h:33,p:52588522},
+    {id:"o-gal",c:"o",b:"gal",h:93,p:143454500},{id:"o-bbva",c:"o",b:"bbva",h:127,p:194444092},{id:"o-san",c:"o",b:"san",h:18,p:26028911}
+  ];
+  ROWS.forEach(function(r){r.avg=r.p/r.h});
+  var DEST=["bbva","san","bna","gal","mac"];
+  var INFO={
+    bbva:{badge:["y","Paga todos los meses"],da:["2,5% del neto de cada persona, todos los meses de 2027","Comisión FAL 0% en 2027 y 0,50% desde 2028","Paquete bonificado y préstamos para empleados"],pide:["Pasar las nóminas antes de dic-2026"],falta:["Permanencia mínima exigida","Si aplica a cada empresa por separado"]},
+    san:{badge:["y","Paga de entrada"],da:["$ 280.000 por persona, en efectivo","Comisión FAL 0% el primer año","Paquetes 100% bonificados para empleados"],pide:["Aceptar antes del 31/10/2026","Mínimo 50 personas","24 meses de permanencia","Facturarle el pago al banco"],falta:["Los $ 80.000: ¿por persona o por nómina?","Penalidad si nos vamos antes de 24 meses","Comisión desde el segundo año"]},
+    bna:{badge:["m","No paga por nómina"],da:["Reintegro del 100% de la comisión FAL hasta dic-2027 (hasta $ 4,4 M)","−3 p.p. en créditos de la empresa hasta dic-2026","−5 p.p. en préstamos Plan Sueldo para empleados"],pide:["Carta de intención","Cuenta corriente en BNA"],falta:["% de comisión de Pellegrini","Tasa de lista actual"]},
+    gal:{badge:["m","No paga por nómina"],da:["Préstamo en pesos al 28,5% a 6 meses (≈ $ 2,2 M de ahorro cada $ 100 M)"],pide:["Adherir el FAL con Galicia"],falta:["Monto máximo del préstamo","Comisión FAL","Costo financiero total"]},
+    mac:{badge:["n","Sin oferta"],da:[],pide:[],falta:["Oferta comercial completa","Comisión FAL"]}
+  };
+  var cnt={}; ROWS.forEach(function(r){cnt[r.id]=r.h});
+  var dest="bbva";
+  function P(v){return "$ "+Math.round(v).toLocaleString("es-AR")}
+  function M(v){return "$ "+(v/1e6).toLocaleString("es-AR",{minimumFractionDigits:1,maximumFractionDigits:1})+" M"}
+  function N(v){return Math.round(v).toLocaleString("es-AR")}
+  function dot(b){return '<i class="dot" style="background:'+BK[b][1]+'"></i>'}
+  (function(){
+    var order=["gal","bbva","mac","san"], h="", tS=0,tO=0,tP=0;
+    order.forEach(function(b){
+      var s=ROWS.filter(function(r){return r.b===b&&r.c==="s"})[0], o=ROWS.filter(function(r){return r.b===b&&r.c==="o"})[0];
+      var hs=s?s.h:0, ho=o?o.h:0, pp=(s?s.p:0)+(o?o.p:0); tS+=hs;tO+=ho;tP+=pp;
+      h+='<tr><td><span class="bk">'+dot(b)+BK[b][0]+'</span></td><td class="r num">'+N(hs)+'</td><td class="r num">'+N(ho)+'</td><td class="r num strong">'+N(hs+ho)+'</td><td class="r num">'+P(pp)+'</td></tr>';
+    });
+    h+='<tr class="grand"><td>Total</td><td class="r num">'+N(tS)+'</td><td class="r num">'+N(tO)+'</td><td class="r num strong">'+N(tS+tO)+'</td><td class="r num">'+P(tP)+'</td></tr>';
+    $("nowBody").innerHTML=h;
+  })();
+  $("destPick").innerHTML=DEST.map(function(d){return '<button type="button" data-d="'+d+'" style="--c:'+BK[d][1]+'">'+dot(d)+BK[d][0]+'</button>'}).join("");
+  [].forEach.call($("destPick").querySelectorAll("button"),function(b){b.addEventListener("click",function(){dest=b.getAttribute("data-d");renderRows();calc()})});
+  function renderRows(){
+    [].forEach.call($("destPick").querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",b.getAttribute("data-d")===dest?"true":"false")});
+    $("moveRows").innerHTML=ROWS.map(function(r){
+      if(r.b===dest)return "";
+      return '<div class="mvrow"><span class="mvlab">'+dot(r.b)+'<b>'+CO[r.c]+'</b>&nbsp;· hoy en '+BK[r.b][0]+'<small>'+N(r.h)+' personas · neto prom. '+P(r.avg)+'</small></span>'+
+        '<input type="range" min="0" max="'+r.h+'" step="1" value="'+cnt[r.id]+'" data-id="'+r.id+'" aria-label="Personas a pasar desde '+CO[r.c]+' '+BK[r.b][0]+'">'+
+        '<input type="number" class="cin" min="0" max="'+r.h+'" step="1" value="'+cnt[r.id]+'" data-id="'+r.id+'" aria-label="Cantidad">'+
+        '<span class="of">de '+N(r.h)+'</span></div>';
+    }).join("")+(ROWS.some(function(r){return r.b===dest})?'<p class="hint">Quienes ya cobran en '+BK[dest][0]+' no se muestran: no suman beneficio.</p>':'');
+    [].forEach.call($("moveRows").querySelectorAll("input"),function(el){el.addEventListener("input",function(){
+      var id=el.getAttribute("data-id"), r=ROWS.filter(function(x){return x.id===id})[0];
+      var v=Math.max(0,Math.min(r.h,Math.round(parseFloat(el.value)||0))); cnt[id]=v;
+      [].forEach.call($("moveRows").querySelectorAll('input[data-id="'+id+'"]'),function(o){if(o!==el)o.value=v});
+      calc();
+    })});
+  }
+  $("mvAll").addEventListener("click",function(){ROWS.forEach(function(r){cnt[r.id]=r.h});renderRows();calc()});
+  $("mvNone").addEventListener("click",function(){ROWS.forEach(function(r){cnt[r.id]=0});renderRows();calc()});
+  function valueFor(bank){
+    var mB=0,hB=0,sC={s:0,o:0};
+    ROWS.forEach(function(r){
+      if(r.b===dest)return; var n=cnt[r.id]; if(!n||r.b===bank)return;
+      if(bank==="bbva"){mB+=n*r.avg*0.025;hB+=n}
+      if(bank==="san"){sC[r.c]+=n}
+    });
+    if(bank==="bbva")return {m:mB,y:mB*12,h:hB};
+    if(bank==="san"){var h=(sC.s>=50?sC.s:0)+(sC.o>=50?sC.o:0);return {y:h*280000,h:h,low:(sC.s>0&&sC.s<50)||(sC.o>0&&sC.o<50)}}
+    if(bank==="bna")return {y:4.37e6};
+    if(bank==="gal")return {y:2.19e6};
+    return {y:0};
+  }
+  function chips(arr,cls){return arr.length?arr.map(function(t){return '<span class="chip '+cls+'">'+t+'</span>'}).join(""):'<span class="chip none">Nada</span>'}
+  function calc(){
+    var tot=0; ROWS.forEach(function(r){if(r.b!==dest)tot+=cnt[r.id]});
+    $("mvTotal").textContent=N(tot)+" personas";
+    var v=valueFor(dest), big, sub, lines="";
+    if(dest==="bbva"){big=P(v.m)+'<small> por mes</small>';sub="Durante 12 meses de 2027 = "+P(v.y)+" en el año";lines="2,5% del neto de "+N(v.h)+" personas, acreditado en la cuenta de la empresa cada mes.";}
+    else if(dest==="san"){big=P(v.y)+'<small> de una vez</small>';sub=P(v.h*200000)+" en dic-2026 + "+P(v.h*80000)+" en feb-2027 · ≈ "+P(v.y/12)+" por mes en 12 meses";lines=v.low?"Alguna empresa no llega a 50 personas: esa parte no cobra.":"$ 280.000 por persona ("+N(v.h)+" personas), en efectivo contra factura.";}
+    else if(dest==="bna"){big='$ 0<small> por nómina</small>';sub="No paga por pasar sueldos. Beneficio: reintegro de la comisión FAL hasta $ 4,4 M en 2027.";}
+    else if(dest==="gal"){big='$ 0<small> por nómina</small>';sub="No paga por pasar sueldos. Ofrece préstamo al 28,5% (≈ $ 2,2 M de ahorro cada $ 100 M).";}
+    else {big='$ 0';sub="Sin beneficios informados.";}
+    var inf=INFO[dest];
+    $("gainCard").style.setProperty("--c",BK[dest][1]);
+    $("gainCard").innerHTML='<div class="gtop"><span class="gname">'+dot(dest)+'Pasando '+N(tot)+' personas a '+BK[dest][0]+'</span><span class="pill '+inf.badge[0]+'">'+inf.badge[1]+'</span></div><div class="gbig num">'+big+'</div><div class="gsub">'+sub+'</div>'+(lines?'<div class="gline">'+lines+'</div>':'');
+    var b=valueFor("bbva"), s=valueFor("san");
+    var list=[["bbva",b.y,M(b.y)+' <small>('+M(b.m)+'/mes)</small>'],["san",s.y,M(s.y)],["bna",4.37e6,"hasta $ 4,4 M"],["gal",2.19e6,"$ 2,2 M*"],["mac",0,"$ 0"]];
+    var mx=Math.max(b.y,s.y,4.37e6)||1;
+    $("cmpBars").innerHTML=list.map(function(x){var w=x[1]?Math.max(x[1]/mx*100,.6):0;return '<div class="hb'+(x[0]===dest?' sel':'')+'"><span class="hbl">'+dot(x[0])+BK[x[0]][0]+'</span><span class="hbt"><span class="hbf" style="width:'+w+'%;background:'+BK[x[0]][1]+'"></span></span><span class="hbv num">'+x[2]+'</span></div>'}).join("");
+    $("gainChips").innerHTML='<div class="dgroup"><span class="glab"><i class="ic ok">✓</i>'+BK[dest][0]+' nos da</span><div class="chips">'+chips(inf.da,"ok")+'</div></div>'+
+      '<div class="dgroup"><span class="glab"><i class="ic ask">!</i>Nos pide</span><div class="chips">'+chips(inf.pide,"ask")+'</div></div>'+
+      '<div class="dgroup"><span class="glab"><i class="ic q">?</i>Falta que nos confirme</span><div class="chips">'+chips(inf.falta,"q")+'</div></div>';
+  }
+  renderRows(); calc();
+})();
+</script>
+
+
+
+
+</body>
+</html>
